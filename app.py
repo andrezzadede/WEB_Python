@@ -43,6 +43,7 @@ from bottle import route, run
 from bottle import request, template
 from bottle import static_file, get
 from bottle import error
+import os
 
 # Static routes
 #usadas para serem colocados arquivos com versoes, em css, js, img, fonts
@@ -64,7 +65,8 @@ def fonts(filename):
 
 ''' LOGIN '''
 
-@route('/login') # @get('/login')
+
+@route('/') # @get('/')
 def login():
     return template('login')
     
@@ -74,7 +76,7 @@ def check_login(username, password):
         return True
     return False
 
-@route('/login', method='POST') # @post('/login')
+@route('/', method='POST') # @post('/')
 def acao_login():
     username = request.forms.get('username')
     password = request.forms.get('password')
@@ -86,6 +88,9 @@ def error404(error):
 
 
 if __name__ == '__main__':
-    run(host='localhost', port=8080, debug=True, reloader=True)
+    if os.environ.get('APP_LOCATION')=='heroku':
+        run(host='0.0.0.0', port=int(os.environ.get('PORT, 500')))
+    else:
+        run(host='localhost', port=8080, debug=True, reloader=True)
 
 #Quando coloca em produção o debug precisa ficar false, para que os erros da aplicação não fiquem expostos aos usuarios
