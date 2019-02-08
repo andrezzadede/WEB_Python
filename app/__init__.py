@@ -1,49 +1,24 @@
-'''
-
-Dessa forma é comm orientação objetos 
-
-from bottle import Bottle, route, run
-
-app = Bottle()
-
-@app.route('/') # Deve interpretar um determinado caminho, endereço que vai no navegador
-def index():
-    return '<h1>Hellooo WORLD</h1>'
+from bottle import Bottle, TEMPLATE_PATH
+from bottle.ext import sqlalchemy
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 
-if __name__ == '__main__':
-    run(app, host='localhost', port=8080, debug=True)
-'''
-
-
-'''
-@route('/') # Deve interpretar um determinado caminho, endereço que vai no navegador
-@route('/user/<nome>')
-def index(nome='Annie'):
-    return '<center><h1>Bonjour ' + nome + '</h1></center>'
-
-@route('/python')
-def python():
-    return '<h1>Curso de Python</h1>'
-
-# imagine que vc tem um site com varios artigos
-
-@route('/artigo/<id>')
-def artigo(id):
-    return '<h1>Você está lendo o artigo ' + id + '</h1>'
-
-#No caso de uma pagina ter um id e um nome de arquivo
-
-@route('/pagina/<id>/<nome>')
-def pagina(id, nome):
-    return '<h1> Você está vendo a pagina ' + id + ' com o nome ' + nome
-'''
-
-
-from bottle import Bottle
+Base = declarative_base()
+engine = create_engine('sqlite:///database.db', echo=True)
 
 app = Bottle()
+TEMPLATE_PATH.insert(0, 'app/views/')
+plugin = sqlalchemy.Plugin(
+    engine, 
+    Base.metadata,
+    keyword='db',
+    create=True,
+    commit=True,
+    use_kwargs=False
+)
+
+app.install(plugin)
 
 from app.controllers import default
-
-
+from app.models import tables
